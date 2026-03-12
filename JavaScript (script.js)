@@ -1,0 +1,107 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Получаем все необходимые элементы
+    const images = document.querySelectorAll('.slider-image');
+    const prevButton = document.querySelector('.prev');
+    const nextButton = document.querySelector('.next');
+    const currentImageSpan = document.getElementById('current-image');
+    const totalImagesSpan = document.getElementById('total-images');
+    const dotsContainer = document.querySelector('.slider-dots');
+    
+    let currentIndex = 0;
+    const totalImages = images.length;
+    
+    // Устанавливаем общее количество изображений
+    totalImagesSpan.textContent = totalImages;
+    
+    // Создаем точки для навигации
+    function createDots() {
+        for (let i = 0; i < totalImages; i++) {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            dot.dataset.index = i;
+            dot.addEventListener('click', () => goToImage(i));
+            dotsContainer.appendChild(dot);
+        }
+        updateDots();
+    }
+    
+    // Обновляем активную точку
+    function updateDots() {
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            if (index === currentIndex) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+    
+    // Функция для переключения на определенное изображение
+    function goToImage(index) {
+        // Убираем активный класс у текущего изображения
+        images[currentIndex].classList.remove('active');
+        
+        // Обновляем индекс
+        currentIndex = index;
+        
+        // Добавляем активный класс новому изображению
+        images[currentIndex].classList.add('active');
+        
+        // Обновляем счетчик
+        currentImageSpan.textContent = currentIndex + 1;
+        
+        // Обновляем точки
+        updateDots();
+    }
+    
+    // Функция для переключения на следующее изображение
+    function nextImage() {
+        let newIndex = currentIndex + 1;
+        
+        // Зацикливание: если дошли до конца, переходим к первому
+        if (newIndex >= totalImages) {
+            newIndex = 0;
+        }
+        
+        goToImage(newIndex);
+    }
+    
+    // Функция для переключения на предыдущее изображение
+    function prevImage() {
+        let newIndex = currentIndex - 1;
+        
+        // Зацикливание: если дошли до начала, переходим к последнему
+        if (newIndex < 0) {
+            newIndex = totalImages - 1;
+        }
+        
+        goToImage(newIndex);
+    }
+    
+    // Добавляем обработчики событий для кнопок
+    prevButton.addEventListener('click', prevImage);
+    nextButton.addEventListener('click', nextImage);
+    
+    // Добавляем поддержку клавиатуры
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'ArrowLeft') {
+            prevImage();
+        } else if (event.key === 'ArrowRight') {
+            nextImage();
+        }
+    });
+    
+    // Создаем точки навигации
+    createDots();
+    
+    // Инициализация: показываем первое изображение
+    goToImage(0);
+    
+    // Добавляем эффект плавной загрузки
+    images.forEach(img => {
+        img.addEventListener('load', function() {
+            this.style.opacity = '1';
+        });
+    });
+});
